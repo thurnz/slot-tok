@@ -1,4 +1,4 @@
-import { FC, HTMLAttributes, useState, useRef, useEffect, useImperativeHandle } from "react";
+import { FC, HTMLAttributes, useState, useCallback, useImperativeHandle } from "react";
 import styled from "styled-components";
 
 
@@ -10,9 +10,9 @@ export const Video: FC<SlotMachineProps> = ({ ref }) => {
   const videos = ['videos/bay.mp4', 'videos/space.mp4', 'videos/sunflower.mp4', 'videos/waterfalls.mp4'];
   const [curVideo, setCurVideo] = useState(0);
 
-  const nextVideo = () => {
+  const nextVideo = useCallback(() => {
     setCurVideo(n => (n + 1) % videos.length);
-  };
+  }, [videos.length]);
 
   useImperativeHandle(ref, () => {
     return {
@@ -20,7 +20,7 @@ export const Video: FC<SlotMachineProps> = ({ ref }) => {
         nextVideo();
       },
     }
-  }, []);
+  }, [nextVideo]);
 
   return(
     <Container>
