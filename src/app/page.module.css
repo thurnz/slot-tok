@@ -7,13 +7,18 @@
   --button-secondary-hover: #f2f2f2;
 
   display: grid;
-  grid-template-rows: 20px 1fr 20px;
-  align-items: center;
-  justify-items: center;
-  min-height: 100svh;
-  padding: 80px;
-  gap: 64px;
+  grid-template-rows: auto;
+  grid-template-columns: 0.5fr 94svh calc(94svh / 16 * 9);
+  height: 100svh;
+  width: 100svw;
+  padding: 3svh 0;
   font-family: var(--font-geist-sans);
+
+  @media (orientation: portrait) {
+    padding: 0;
+    grid-template-rows: 1fr 1fr;
+    grid-template-columns: auto;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -123,41 +128,6 @@ a.secondary {
   .footer a:hover {
     text-decoration: underline;
     text-underline-offset: 4px;
-  }
-}
-
-@media (max-width: 600px) {
-  .page {
-    padding: 32px;
-    padding-bottom: 80px;
-  }
-
-  .main {
-    align-items: center;
-  }
-
-  .main ol {
-    text-align: center;
-  }
-
-  .ctas {
-    flex-direction: column;
-  }
-
-  .ctas a {
-    font-size: 14px;
-    height: 40px;
-    padding: 0 16px;
-  }
-
-  a.secondary {
-    min-width: auto;
-  }
-
-  .footer {
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
   }
 }
 
