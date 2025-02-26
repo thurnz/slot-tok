@@ -1,12 +1,15 @@
-import { FC, HTMLAttributes, useState, useCallback, useImperativeHandle } from "react";
+import { FC, HTMLAttributes, useState, useCallback, useImperativeHandle, RefObject } from "react";
 import styled from "styled-components";
 
-
-export type VideoProps = HTMLAttributes<HTMLDivElement> & {
-
+export type VideoHandle = {
+  next: () => void;
 };
 
-export const Video: FC<SlotMachineProps> = ({ ref }) => {
+export type VideoProps = HTMLAttributes<HTMLDivElement> & {
+  ref: RefObject<VideoHandle | null>;
+};
+
+export const Video: FC<VideoProps> = ({ ref }) => {
   const videos = ['videos/bay.mp4', 'videos/space.mp4', 'videos/sunflower.mp4', 'videos/waterfalls.mp4'];
   const [curVideo, setCurVideo] = useState(0);
 
