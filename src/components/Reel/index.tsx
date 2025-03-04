@@ -53,10 +53,10 @@ export const Reel: FC<ReelProps> = ({ id, item, duration, texture, width, onFini
 
   useTick(() => {
     const curY = targetYRef.current % size.height;
-
-    if(y === curY) return;
-
     const time = duration * 1000;
+
+    if(y === curY && Math.ceil(deltaRef.current) >= time) return;
+
     deltaRef.current += ticker.deltaMS;
     const ratio = deltaRef.current / time;
     const pace = easeInOutSine(ratio) * distanceRef.current;
