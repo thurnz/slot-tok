@@ -1,21 +1,53 @@
-import { FC, HTMLAttributes, useState, useRef, useEffect } from "react";
+import { FC, useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import { Reel } from "../Reel";
+import { Application } from "@pixi/react";
+import { Assets, Texture } from "pixi.js";
+import { useDebounceCallback, useEventListener } from "usehooks-ts";
 
-
-export type SlotMachineProps = HTMLAttributes<HTMLDivElement> & {
+export interface SlotMachineProps {
   onSpin: () => void;
 };
 
 export const SlotMachine: FC<SlotMachineProps> = ({ onSpin }) => {
-  const itemRef= useRef([0, 1, 2, 3, 4]);
-  const time = [0.75, 1, 1.25, 1.5, 2];
+  const itemRef= useRef([0, 0, 0, 0, 0]);
+  const timeRef = useRef([0, 0, 0, 0, 0]);
   const [isSpinning, setIsSpinning] = useState(false);
   const ctrRef = useRef(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [texture, setTexture] = useState<Texture>();
+  const [width, setWidth] = useState(0);
+
+  const handleResize = () => {
+    if(containerRef.current) setWidth(containerRef.current.clientWidth);
+  };
+
+  useEffect(() => {
+    handleResize();
+  });
+
+  const debounceResize = useDebounceCallback(handleResize, 250);
+  useEventListener('resize', debounceResize);
+
+  useEffect(() => {
+    const load = async () => {
+      const t = await Assets.load("images/fruits.png");
+      setTexture(t);
+    };
+
+    if(!texture) load();
+  }, [texture]);
 
   const handleRepeat = () => {
     if(isSpinning) return;
-    itemRef.current = itemRef.current.map(() => 9 + Math.floor(Math.random() * 9));
+    itemRef.current = itemRef.current.map((value) => {
+      let n = value;
+      while(n === value){
+        n = Math.floor(Math.random() * 9);
+      };
+      return n;
+    });
+    timeRef.current = [0.75, 1, 1.25, 1.5, 2];
     setIsSpinning(true);
   };
 
@@ -28,14 +60,18 @@ export const SlotMachine: FC<SlotMachineProps> = ({ onSpin }) => {
 
   const handleFinish = () => {
     ctrRef.current++;
-    if(ctrRef.current >= 10) setIsSpinning(false);
+    if(ctrRef.current >= itemRef.current.length) setIsSpinning(false);
   };
 
+  if(!texture) return null;
+
   return(
-    <Container >
-      {itemRef.current.map((value, index) => 
-        <Reel key={index} item={value} duration={time[index]} reset={!isSpinning} onFinish={handleFinish} />
-      )}
+    <Container ref={containerRef}>
+      <Application resizeTo={containerRef} backgroundAlpha={0}>
+        {itemRef.current.map((value, index) => 
+          <Reel key={index} id={index} item={value} duration={timeRef.current[index]} texture={texture} width={width / itemRef.current.length} onFinish={handleFinish} />
+        )}
+      </Application>
       <Repeat onClick={handleRepeat} $disable={isSpinning} />
     </Container>
   );
@@ -47,8 +83,6 @@ const Container = styled.div`
   height: 100%;
   background-color: #000;
   overflow: hidden;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
   grid-row: 1;
   grid-column: 2 / 3;
 
